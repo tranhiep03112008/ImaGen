@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Tạo Ảnh AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffe0f0 50%, #ffd4e8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff69b4;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.2);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #ff85c0;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .upload-area { 
+            border: 3px dashed #ffb6d9;
+            background: linear-gradient(135deg, #fff5fb 0%, #ffe8f5 100%);
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+        }
+
+        .upload-area:hover { 
+            border-color: #ff69b4;
+            background: linear-gradient(135deg, #fff0f8 0%, #ffddf0 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.15);
+        }
+
+        .upload-area-text {
+            color: #ff69b4;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .upload-area-hint {
+            color: #ffb6d9;
+            font-size: 0.9em;
+        }
+
+        #uploadedPhotos {
+            margin: 25px 0;
+            padding: 20px;
+            background: #fff5fb;
+            border-radius: 15px;
+            border: 2px solid #ffe0f0;
+        }
+
+        #uploadedPhotos strong {
+            color: #ff69b4;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .photos-grid { 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .photo-wrapper {
+            position: relative;
+            width: 100%;
+            height: 120px;
+        }
+
+        .photo-thumb { 
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 3px solid #ffb6d9;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .photo-thumb:hover {
+            transform: scale(1.05);
+            border-color: #ff69b4;
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.3);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 28px;
+            height: 28px;
+            background: #ff69b4;
+            color: white;
+            border: 3px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
+            z-index: 10;
+        }
+
+        .delete-btn:hover {
+            background: #ff1493;
+            transform: scale(1.15);
+            box-shadow: 0 6px 15px rgba(255, 105, 180, 0.6);
+        }
+
+        h3 {
+            color: #ff69b4;
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        select, textarea, button { 
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #ffb6d9;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+            color: #ff69b4;
+            font-weight: 500;
+        }
+
+        select option {
+            padding: 10px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+            color: #666;
+        }
+
+        button { 
+            background: linear-gradient(135deg, #ff69b4 0%, #ff85c0 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #ff5aa5 0%, #ff69b4 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(255, 105, 180, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: linear-gradient(135deg, #ffb6d9 0%, #ffc8e0 100%);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #generatedImage { 
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        #generatedImage h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #generatedImage img { 
+            max-width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(255, 105, 180, 0.3);
+            border: 5px solid #ffb6d9;
+            transition: all 0.3s ease;
+        }
+
+        #generatedImage img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 50px rgba(255, 105, 180, 0.4);
+        }
+
+        .note { 
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3d6 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #ffb6d9;
+            color: #666;
+        }
+
+        .note strong {
+            color: #ff69b4;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .photo-count {
+            display: inline-block;
+            background: #ff69b4;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Tạo Ảnh AI</h1>
+        <p class="subtitle">Biến đổi ảnh của bạn với trí tuệ nhân tạo</p>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-area-text">📸 Kéo thả ảnh vào đây hoặc nhấn để chọn</div>
+            <div class="upload-area-hint">PNG, JPG, GIF tối đa 10MB</div>
+            <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+        </div>
+
+        <div id="uploadedPhotos">
+            <strong>Ảnh đã tải lên <span class="photo-count" id="photoCount">0</span></strong>
+            <div class="photos-grid"></div>
+        </div>
+
+        <h3>🎨 Chọn phong cách biến đổi:</h3>
+        <select id="styleSelect">
+            <option value="">-- Chọn một phong cách --</option>
+            <option value="Transform this photo into Japanese anime art style">🎨 Phong Cách Anime</option>
+            <option value="Turn this photo into a classic oil painting">🖼️ Tranh Sơn Dầu</option>
+            <option value="Give this image a futuristic cyberpunk look with neon lights and high-tech elements">🤖 Cyberpunk</option>
+            <option value="Apply a soft and fluid watercolor artistic effect to this photo">💧 Màu Nước</option>
+            <option value="Convert this photo to a retro vintage photographic style from past decades">📷 Cổ Điển</option>
+            <option value="Add a magical and fantastical touch to this image, like a fairy tale scene">✨ Thần Thoại</option>
+            <option value="Transform this into a dreamy pastel pink aesthetic">🌸 Hồng Pastel</option>
+            <option value="Make this photo look like a romantic sunset scene">🌅 Hoàng Hôn Lãng Mạn</option>
+            <option value="[Cinematic photography, festive portrait, dreamlike realism], [A young Vietnamese girl, dressed in a traditional red Ao Dai with intricate embroidered floral patterns, holding a glowing circular lantern, standing in front of an enormous, bright full moon], [Detailed floral embroidery in blue and pink on the lower half of her red Ao Dai, a subtle pearl necklace on her high collar, and her black hair neatly tied into a bun. The glowing lantern in her hands features delicate traditional patterns. The mid-ground showcases sparse tree branches adorned with numerous small red traditional lanterns and hints of blossoming red flowers, with one yellow star-shaped lantern visible. The lush foreground is filled with abundant beds of vibrant yellow and reddish-brown chrysanthemum-like flowers. A tranquil body of water is faintly visible at the distant horizon, beneath a deep indigo night sky sprinkled with delicate twinkling stars.], [Vibrant reds (Ao Dai, lanterns, blossoms), rich yellows (chrysanthemums, lantern glow), deep blues (sky, Ao Dai embroidery), pristine whites (moon, girl's pants), and subtle pinks. Overall, a warm, festive, and enchanting color palette.], [Ethereal, soft moonlight intensely backlights the entire scene, making the gigantic full moon appear luminous and casting a gentle glow over the surroundings. The glowing lantern held by the girl emits a warm, bright golden light, acting as a striking key light that beautifully illuminates her face, hands, and the immediate foreground, creating a captivating interplay of light and shadow against the nocturnal backdrop.], [Full body shot of the girl, positioned slightly off-center to the left, standing tall and proud. The colossal full moon dominates the upper background, perfectly centered behind her head, acting as a magnificent halo. The foreground is richly layered with flowers, while the mid-ground features decorative trees, creating a sense of depth. A low horizon line emphasizes the vastness of the moon and sky. Balanced composition with a strong central element.]">Tết Trung Thu</option>
+        </select>
+
+        <h3>✍️ Hoặc tạo prompt của riêng bạn:</h3>
+        <textarea id="customPrompt" placeholder="Nhập prompt tùy chỉnh của bạn (ví dụ: 'Biến ảnh này thành phong cảnh thành phố cyberpunk')"></textarea>
+
+        <button id="generateBtn">🚀 Tạo ảnh</button>
+
+        <div id="generatedImage"></div>
+
+        <div class="note">
+            <strong>⚠️ Lưu ý quan trọng</strong>
+            Để sử dụng ứng dụng này, bạn cần lấy API key miễn phí từ Google Gemini tại 
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #ff69b4;">AI Studio</a>. 
+            Thay thế <code>YOUR_GEMINI_API_KEY</code> trong mã JavaScript bằng key của bạn. 
+            Mô hình sử dụng là <code>gemini-2.0-flash-exp</code> có hỗ trợ tạo ảnh.
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'AIzaSyDykBVImSOu7ML1uTLtk1i-tcxEPgSmByo'; // ← Thay bằng API key thật của bạn từ AI Studio
+        const MODEL = 'gemini-2.0-flash-exp'; // Mô hình hỗ trợ tạo ảnh
+        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+        // Upload logic
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const photosGrid = document.querySelector('.photos-grid');
+        const photoCount = document.getElementById('photoCount');
+        let uploadedFiles = [];
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => { 
+            e.preventDefault(); 
+            uploadArea.style.borderColor = '#ff69b4'; 
+            uploadArea.style.transform = 'scale(1.02)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ffb6d9';
+            uploadArea.style.transform = 'scale(1)';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ffb6d9';
+            uploadArea.style.transform = 'scale(1)';
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            for (let file of Array.from(files)) {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`Tệp ${file.name} quá lớn (>10MB)`);
+                    continue;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'photo-wrapper';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'photo-thumb';
+                    img.title = file.name;
+                    
+                    const deleteBtn = document.createElement('div');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.title = 'Xóa ảnh';
+                    
+                    const fileData = { 
+                        name: file.name, 
+                        base64: e.target.result.split(',')[1], 
+                        mimeType: file.type,
+                        element: wrapper
+                    };
+                    
+                    deleteBtn.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        removePhoto(fileData);
+                    });
+                    
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(deleteBtn);
+                    photosGrid.appendChild(wrapper);
+                    
+                    uploadedFiles.push(fileData);
+                    updatePhotoCount();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removePhoto(fileData) {
+            const index = uploadedFiles.indexOf(fileData);
+            if (index > -1) {
+                uploadedFiles.splice(index, 1);
+                fileData.element.remove();
+                updatePhotoCount();
+            }
+        }
+
+        function updatePhotoCount() {
+            photoCount.textContent = uploadedFiles.length;
+        }
+
+        // Generate logic
+        const generateBtn = document.getElementById('generateBtn');
+        const generatedDiv = document.getElementById('generatedImage');
+
+        generateBtn.addEventListener('click', async () => {
+            if (uploadedFiles.length === 0) {
+                alert('Vui lòng tải lên ít nhất một ảnh! 📸');
+                return;
+            }
+            
+            if (!API_KEY || API_KEY === 'YOUR_GEMINI_API_KEY') {
+                alert('Vui lòng thêm API key Gemini của bạn vào mã JavaScript! 🔑\n\nLấy key tại: https://aistudio.google.com/app/apikey');
+                return;
+            }
+
+            const styleSelect = document.getElementById('styleSelect');
+            const customPrompt = document.getElementById('customPrompt').value.trim();
+            let prompt = customPrompt || styleSelect.value;
+            
+            if (!prompt) {
+                alert('Vui lòng chọn phong cách hoặc nhập prompt tùy chỉnh! ✍️');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="loading-spinner"></span> Đang tạo...';
+            generatedDiv.innerHTML = '<p style="color: #ff69b4; font-size: 1.2em;">✨ Đang tạo ảnh kỳ diệu của bạn...</p>';
+
+            try {
+                const file = uploadedFiles[0];
+                const payload = {
+                    contents: [{
+                        parts: [
+                            { text: prompt },
+                            {
+                                inlineData: {
+                                    mimeType: file.mimeType,
+                                    data: file.base64
+                                }
+                            }
+                        ]
+                    }],
+                    generationConfig: {
+                        responseModalities: ['TEXT', 'IMAGE'],
+                        temperature: 1.0,
+                        topP: 0.95,
+                        topK: 40
+                    },
+                    safetySettings: [
+                        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+                    ]
+                };
+
+                const response = await fetch(`${ENDPOINT}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Lỗi API: ${response.status} - ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('API Response:', data);
+
+                const candidate = data.candidates?.[0];
+                if (!candidate) {
+                    throw new Error('Không có ảnh được tạo bởi API');
+                }
+
+                const imagePart = candidate.content.parts.find(part => part.inlineData && part.inlineData.mimeType.startsWith('image/'));
+                
+                if (!imagePart) {
+                    throw new Error('Không tìm thấy ảnh trong phản hồi. Mô hình có thể chỉ trả về văn bản.');
+                }
+
+                const imgSrc = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+                generatedDiv.innerHTML = `
+                    <h3>🎨 Ảnh đã biến đổi của bạn:</h3>
+                    <img src="${imgSrc}" alt="Generated Image">
+                    <p style="margin-top: 15px; color: #ff85c0;">
+                        <a href="${imgSrc}" download="ai-generated-image.png" style="color: #ff69b4; text-decoration: none; font-weight: bold;">
+                            💾 Tải xuống ảnh
+                        </a>
+                    </p>
+                `;
+
+            } catch (error) {
+                console.error('Lỗi chi tiết:', error);
+                let errorMessage = error.message;
+                
+                if (errorMessage.includes('API_KEY_INVALID')) {
+                    errorMessage = 'API key không hợp lệ. Kiểm tra key của bạn trên AI Studio.';
+                } else if (errorMessage.includes('PERMISSION_DENIED')) {
+                    errorMessage = 'Quyền truy cập bị từ chối. Đảm bảo API key có quyền phù hợp.';
+                } else if (errorMessage.includes('MODEL_NOT_FOUND')) {
+                    errorMessage = 'Không tìm thấy mô hình. Thử "gemini-2.0-flash-exp" hoặc kiểm tra các mô hình có sẵn.';
+                }
+                
+                alert(`❌ Lỗi: ${errorMessage}\n\nXem console để biết thêm chi tiết.`);
+                generatedDiv.innerHTML = `
+                    <div style="background: #ffe0f0; padding: 20px; border-radius: 15px; border-left: 5px solid #ff69b4;">
+                        <p style="color: #ff69b4; font-weight: bold;">❌ Lỗi khi tạo ảnh</p>
+                        <p style="color: #666; margin-top: 10px;">${errorMessage}</p>
+                        <p style="color: #999; margin-top: 10px; font-size: 0.9em;">Kiểm tra console trình duyệt để biết thêm chi tiết.</p>
+                    </div>
+                `;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '🚀 Tạo ảnh';
+            }
+        });
+    </script>
+</body>
+</html>
